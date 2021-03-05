@@ -125,4 +125,12 @@ class FriendRepository implements \Overdose\LessonOne\Api\FriendRepositoryInterf
 
         return $searchResult;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getEmptyModel()
+    {
+        return $this->friendsFactory->create();
+    }
 }

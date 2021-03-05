@@ -39,7 +39,7 @@ class Friends extends \Magento\Framework\Model\AbstractModel implements FriendIn
      */
     public function setAge($age)
     {
-        return $this->setData(FriendInterface::FIELD_NAME_COMMENT, $age);
+        return $this->setData(FriendInterface::FIELD_NAME_AGE, $age);
     }
 
     /**

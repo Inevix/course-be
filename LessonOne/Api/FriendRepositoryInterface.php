@@ -40,4 +40,9 @@ interface FriendRepositoryInterface
      * @return \Magento\Framework\Api\SearchResultsInterface
      */
     public function getList(\Magento\Framework\Api\SearchCriteriaInterface $searchCriteria);
+
+    /**
+     * @return \Overdose\LessonOne\Api\Data\FriendInterface|\Overdose\LessonOne\Model\Friends
+     */
+    public function getEmptyModel();
 }

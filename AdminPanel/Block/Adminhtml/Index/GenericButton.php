@@ -2,29 +2,46 @@
 
 namespace Overdose\AdminPanel\Block\Adminhtml\Index;
 
+use Exception;
 use Magento\Backend\Block\Widget\Context;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Overdose\LessonOne\Api\FriendRepositoryInterface;
+use Overdose\LessonOne\Model\FriendRepository;
 
 abstract class GenericButton
 {
-
     protected $context;
 
     /**
-     * @param \Magento\Backend\Block\Widget\Context $context
+     * @var FriendRepositoryInterface|FriendRepository
      */
-    public function __construct(Context $context)
-    {
-        $this->context = $context;
-    }
+    protected $friendsRepository;
 
     /**
-     * Return model ID
-     *
-     * @return int|null
+     * @param \Magento\Backend\Block\Widget\Context $context
+     * @param FriendRepositoryInterface $friendsRepository
      */
-    public function getModelId()
+    public function __construct(
+        Context $context,
+        FriendRepositoryInterface $friendsRepository
+    ) {
+        $this->context = $context;
+        $this->friendsRepository = $friendsRepository;
+    }
+
+    public function getFriendId()
     {
-        return $this->context->getRequest()->getParam('id');
+        $id = $this->context->getRequest()->getParam('id');
+
+        if ($id) {
+            try {
+                return $this->friendsRepository->getById($id);
+            } catch (Exception $e) {
+                throw new NoSuchEntityException(__($e->getMessage()));
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -39,4 +56,3 @@ abstract class GenericButton
         return $this->context->getUrlBuilder()->getUrl($route, $params);
     }
 }
-

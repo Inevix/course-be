@@ -25,7 +25,7 @@ class SaveButton extends GenericButton implements ButtonProviderInterface
                                 'targetName' => 'overdose_friends_form.overdose_friends_form',
                                 'actionName' => 'save',
                                 'params' => [
-                                    false
+                                    true
                                 ]
                             ]
                         ]

@@ -3,44 +3,17 @@
 namespace Overdose\LessonOne\Model;
 
 use Magento\Framework\App\Request\DataPersistorInterface;
-use Overdose\LessonOne\Model\ResourceModel\Collection\Friends;
-use Overdose\LessonOne\Model\ResourceModel\Collection\FriendsFactory as CollectionFactory;
 use Magento\Ui\DataProvider\Modifier\PoolInterface;
-use Magento\Ui\DataProvider\AbstractDataProvider;
+use Magento\Ui\DataProvider\ModifierPoolDataProvider;
+use Overdose\LessonOne\Model\ResourceModel\Collection\FriendsFactory as CollectionFactory;
 
-class DataProvider extends AbstractDataProvider
+class DataProvider extends ModifierPoolDataProvider
 {
-    /**
-     * @var \Overdose\LessonOne\Model\Friends $model
-     */
-    private $model;
 
-    /**
-     * @var Friends $resourceModel
-     */
-    private $resourceModel;
 
-    /**
-     * @var array
-     */
+    protected $collection;
     protected $loadedData;
-
-    /**
-     * Core registry
-     *
-     * @var \Magento\Framework\Registry
-     */
-    protected $coreRegistry;
-
-    /**
-     * @var \Magento\SalesRule\Model\Rule\Metadata\ValueProvider
-     */
-    protected $metadataValueProvider;
-
-    /**
-     * @var DataPersistorInterface
-     */
-    private $dataPersistor;
+    protected $dataPersistor;
 
     /**
      * Initialize dependencies.
@@ -49,38 +22,34 @@ class DataProvider extends AbstractDataProvider
      * @param string $primaryFieldName
      * @param string $requestFieldName
      * @param CollectionFactory $collectionFactory
-     * @param \Magento\Framework\Registry $registry
      * @param array $meta
      * @param array $data
-     * @param DataPersistorInterface $dataPersistor
+     * @param DataPersistorInterface|null $dataPersistor
+     * @param PoolInterface|null $pool
      */
     public function __construct(
-        $name,
-        $primaryFieldName,
-        $requestFieldName,
+        string $name,
+        string $primaryFieldName,
+        string $requestFieldName,
         CollectionFactory $collectionFactory,
         array $meta = [],
         array $data = [],
-        DataPersistorInterface $dataPersistor = null
+        DataPersistorInterface $dataPersistor = null,
+        PoolInterface $pool = null
     ) {
         $this->collection = $collectionFactory->create();
         $this->dataPersistor = $dataPersistor;
-        parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
+        parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data, $pool);
     }
 
-    /**
-     * Get data
-     *
-     * @return array
-     */
     public function getData()
     {
-        if(isset($this->loadData)){
+        if (isset($this->loadedData)) {
             return $this->loadedData;
         }
         $items = $this->collection->getItems();
 
-        /** @var \Overdose\LessonOne\Model\Friends $friends */
+        /** @var \Overdose\LessonOne\Model\Friends $friend */
         foreach ($items as $friend) {
             $this->loadedData[$friend->getId()] = $friend->getData();
         }

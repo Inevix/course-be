@@ -1,28 +1,40 @@
 <?php
+
 namespace Overdose\AdminPanel\Controller\Adminhtml\Index;
+
+use Exception;
+use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\Exception\CouldNotSaveException;
 
 class Save extends AbstractController
 {
     public function execute()
     {
+        $redirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
         $data = $this->getRequest()->getPostValue();
 
-        $id = $this->getRequest()->getParam('id');
-        $model = $this->_objectManager->create(\Overdose\LessonOne\Model\Friends::class)->load($id);
+        $model = $data['id']
+            ? $this->friendRepository->getById($data['id'])
+            : $this->friendRepository->getEmptyModel();
 
-        $model->setData($data);
+        $model->setName($data['name'])
+            ->setAge($data['age'])
+            ->setComment($data['comment']);
 
-        try {
-            $model->save();
-            $this->dataPersistor->clear('overdose_lesson_one');
-
-            $this->messageManager->addSuccessMessage(__("Yay. Now you have a new friend! Successfully saved to the database!"));
-        } catch (\Exception $e) {
-            $this->messageManager->addErrorMessage(__("Sorry, was unable to save a friend form. =("));
+        if ($data['id']) {
+            $model->setId($data['id']);
         }
 
-        $redirect = $this->resultRedirectFactory->create();
+        try {
+            $this->friendRepository->save($model);
 
-        return $redirect->setPath('*/*/index');
+            $this->messageManager->addSuccessMessage(__('Friend has been successfully saved'));
+            $redirect->setPath(self::DEFAULT_ACTION_PATH . 'edit', ['id' => $model->getId()]);
+        } catch (Exception | CouldNotSaveException $e) {
+            $this->messageManager->addErrorMessage(__($e->getMessage()));
+            $redirect->setPath(self::DEFAULT_ACTION_PATH . 'index');
+        }
+
+        return $redirect;
     }
 }
